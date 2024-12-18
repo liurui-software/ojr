@@ -1,0 +1,45 @@
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = "com.ojr"
+version = "0.1.0"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("com.bettercloud:vault-java-driver:5.1.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
+	
+    testImplementation platform('org.junit:junit-bom:5.11.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
+}
+
+shadowJar {
+    archiveBaseName.set('ojr-vault-all')
+    archiveVersion.set('0.1.0')
+    archiveClassifier.set('')
+}
+
+publishing {
+    publications {
+        maven(org.gradle.api.publish.maven.MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

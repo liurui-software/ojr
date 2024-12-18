@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = "com.ojr"
+version = "0.1.0"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("com.google.guava:guava:33.3.1-jre")
+    implementation("io.opentelemetry:opentelemetry-api:1.45.0")
+    implementation("io.opentelemetry:opentelemetry-sdk-common:1.45.0")
+    implementation("io.opentelemetry:opentelemetry-sdk:1.45.0")
+    implementation("io.opentelemetry:opentelemetry-exporter-common:1.45.0")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.45.0")
+    implementation("io.opentelemetry:opentelemetry-exporter-sender-okhttp:1.45.0")
+    implementation("io.opentelemetry:opentelemetry-exporter-prometheus:1.45.0-alpha")
+    implementation("io.opentelemetry.semconv:opentelemetry-semconv:1.28.0-alpha")
+    implementation("io.opentelemetry.semconv:opentelemetry-semconv-incubating:1.28.0-alpha")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
+
+    implementation(files("libs/ojr-core-0.1.0.jar"))
+    implementation(files("libs/ojr-vault-all-0.1.0.jar"))
+    implementation(files("libs/ojr-rdb-0.1.0.jar"))
+    implementation(files("libs/DmJdbcDriver8.jar"))
+
+    testImplementation platform('org.junit:junit-bom:5.11.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
+}
+
+application {
+    mainClass = 'com.ojr.dameng.DamengAgent'
+}
+
+applicationDistribution.from("config") {
+    into "config"
+}
+
+applicationDistribution.from("logs") {
+    into "logs"
+}
+
+test {
+    useJUnitPlatform()
+}
