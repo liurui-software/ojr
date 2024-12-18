@@ -1,0 +1,20 @@
+#Database properties:
+db.system: dameng
+db.driver: dm.jdbc.driver.DmDriver
+
+instances:
+  - db.address: 192.168.3.14
+    db.port: 5236
+    db.username: SYSDBA
+    db.password: TXlQYXNzd29yZA==
+    db.connection.url: jdbc:dm://192.168.3.14:5236
+    db.name: myDB1
+
+    #OTel properties:
+    otel.poll.interval: 25
+    otel.callback.interval: 30
+    #otel.backend.url: http://localhost:4317
+    otel.backend.url: http://localhost:4318
+    otel.transport: http+prometheus
+    prometheus.port: 16543
+    otel.service.name: DamengA

@@ -1,0 +1,46 @@
+db.system: informix
+db.driver: com.informix.jdbc.IfxDriver
+
+instances:
+  - db.address: xxx.xxx.xxx.xxx #IP Address
+    db.port: 9088 #Port on which DB is running
+    db.serverName: ol_informix1410
+    db.username: Informix_User_Name
+    ### Either use password with Base 64 encoding or use vault configuration.
+    db.password: BASE64_Encoded_Password
+    #db.password:
+    #  vault_secret.path: #path to the vault secret. Example: /kv/instana/informix
+    #  vault_secret.key: #Provide the VaultSecretKey name
+    db.name: InformixDB
+    db.path: /opt/IBM/Informix_Software_Bundle
+
+    #OTel properties:
+    otel.service.name: InformixDB
+
+    #Data collector properties:
+    #Either use `poll.interval` or `custom.poll.interval`
+    otel.poll.interval: 25
+    #All three category value is Mandatory if leveraging Custom Poll Rate
+    custom.poll.interval:
+      high: 300 #polling_value_in_sec
+      medium: 45 #polling_value_in_sec
+      low: 20 #polling_value_in_sec
+    otel.callback.interval: 30
+    #otel.backend.url: http://localhost:4317
+    otel.backend.url: http://localhost:4318
+    otel.transport: http+prometheus
+    prometheus.port: 16543
+
+    #Custom Input
+    custom.input:
+      #Time Frame for which you want to get the expensive query. Default value 900 Sec
+      db.sql.elapsed.timeframe: 900   # Values should be in Seconds
+      db.sequential.scan.count: 0
+      db.sql.trace.enabled: false #Default is false. Make it true only if `SqlTrace` is enabled for the DB.
+### Uncomment the below section in case you are using Vault to retrieve the password.
+#vault:
+#  connection_url: #Vault Address URL
+#  token: #Vault Token
+#  #Use the pem file path in case you are using TLS/SSL connection for vault.
+#  #path_to_pem_file: auth/web-cert.pem
+#  kv_version: 2 #It is the vault version. Please crosscheck your configuration.

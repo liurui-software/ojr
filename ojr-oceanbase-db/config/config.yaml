@@ -1,0 +1,41 @@
+#Database properties:
+db.system: Oceanbase4
+db.driver: com.mysql.jdbc.Driver
+
+instances:
+  - db.address: localhost
+    db.port: 2881
+    db.username: root@sys
+    db.password: MTIzNDU2
+    db.connection.url: jdbc:mysql://localhost:2881/oceanbase?autoReconnect=true&useSSL=false
+    db.name: oceanbase
+    db.entity.type: cluster
+
+    #OTel properties:
+    otel.poll.interval: 25
+    otel.callback.interval: 30
+    #otel.backend.url: http://localhost:4317
+    otel.backend.url: http://localhost:4318
+    otel.transport: http+prometheus
+    prometheus.port: 16543
+    otel.service.name: OBCluster1
+    otel.service.instance.id: cluster@OBCluster1
+
+  - db.address: localhost
+    db.port: 2881
+    db.username: root@sys
+    db.password: MTIzNDU2
+    db.connection.url: jdbc:mysql://localhost:2881/oceanbase?autoReconnect=true&useSSL=false
+    db.name: oceanbase
+    db.entity.type: tenant
+    db.tenant.name: test
+
+    #OTel properties:
+    otel.poll.interval: 25
+    otel.callback.interval: 30
+    #otel.backend.url: http://localhost:4317
+    otel.backend.url: http://localhost:4318
+    otel.transport: http+prometheus
+    prometheus.port: 16543
+    otel.service.name: OBCluster1
+    otel.service.instance.id: test1@OBCluster1

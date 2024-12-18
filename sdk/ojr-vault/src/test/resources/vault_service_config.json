@@ -1,0 +1,7 @@
+{
+  "connection_url": "http://localhost:8200",
+  "token": "s.1234567890",
+  "secret_refresh_rate": 2,
+  "kv_version": 2,
+  "path_to_pem_file": "/path/to/pemfile.pem"
+}

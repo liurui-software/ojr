@@ -1,0 +1,55 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = "com.ojr"
+version = "0.1.0"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api("com.google.guava:guava:33.3.1-jre")
+    api("io.opentelemetry:opentelemetry-api:1.45.0")
+    api("io.opentelemetry:opentelemetry-sdk-common:1.45.0")
+    api("io.opentelemetry:opentelemetry-sdk:1.45.0")
+    api("io.opentelemetry:opentelemetry-exporter-common:1.45.0")
+    api("io.opentelemetry:opentelemetry-exporter-otlp:1.45.0")
+    api("io.opentelemetry:opentelemetry-exporter-sender-okhttp:1.45.0")
+    api("io.opentelemetry:opentelemetry-exporter-prometheus:1.45.0-alpha")
+    api("io.opentelemetry.semconv:opentelemetry-semconv:1.28.0-alpha")
+    api("io.opentelemetry.semconv:opentelemetry-semconv-incubating:1.28.0-alpha")
+    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
+
+    implementation(files("libs/ojr-core-0.1.0.jar"))
+
+    testImplementation platform('org.junit:junit-bom:5.11.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.named('jar') {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
