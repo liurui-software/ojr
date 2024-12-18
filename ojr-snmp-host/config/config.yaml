@@ -1,0 +1,24 @@
+host.system: snmp_host
+
+instances:
+  - snmp.host: udp:9.30.78.59/161
+    poll.interval: 25
+    callback.interval: 30
+    #otel.backend.url: http://localhost:4317
+    otel.backend.url: http://localhost:4318
+    otel.transport: http+prometheus
+    prometheus.port: 16543
+    #host.name: stantest0.fyre.ibm.com
+    #os.type: linux
+    #community: public
+    #retries: 3
+    #timeout: 1000
+    version: 3
+    securityLevel: 3
+    securityName: linuser
+    authPassword: linuserpass
+    privacyPassword: linprivpass
+    #AuthSHA: 1.3.6.1.6.3.10.1.1.3
+    authType: 1.3.6.1.6.3.10.1.1.3
+    #PrivDES: 1.3.6.1.6.3.10.1.2.2
+    privacyType: 1.3.6.1.6.3.10.1.2.2

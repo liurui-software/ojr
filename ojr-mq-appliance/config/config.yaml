@@ -1,0 +1,14 @@
+host.system: mq_appliance
+
+instances:
+  - appliance.host: testbox1.mqappliance.com
+    appliance.user: admin
+    appliance.password: xxxxxxxx
+
+    #Data collector properties:
+    poll.interval: 25
+    callback.interval: 30
+    #otel.backend.url: http://localhost:4317
+    otel.backend.url: http://localhost:4318
+    otel.transport: http+prometheus
+    prometheus.port: 16543

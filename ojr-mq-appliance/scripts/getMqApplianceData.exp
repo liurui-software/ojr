@@ -1,0 +1,231 @@
+#!/usr/bin/expect -f
+
+#
+# (c) Copyright IBM Corp. 2024
+# (c) Copyright Instana Inc.
+#
+
+# Uncomment to suppress normal output to stdout
+log_user 0
+
+set timeout 30
+
+set appliance1 [lindex $argv 0]
+set appliance1_name "Appliance1"
+set userid [lindex $argv 1]
+set password [lindex $argv 2]
+set pollInterval [lindex $argv 3]
+
+set system_metric          		        ""
+set network_connections_metric          ""
+set network_interface_metric            ""
+set qmgr_status                         ""
+
+proc sshLogin {id userid password namevar} {
+    upvar 1 $namevar name
+    expect -i $id "login:"
+    send -i $id "${userid}\n"
+    expect -i $id "Password:"
+    send -i $id "${password}\n"
+    expect -i $id "#"
+    send -i $id "show system\n"
+    expect -i $id "#"
+    set lines [split $expect_out(buffer) \n]
+    set variable [lindex $lines 1]
+    foreach line $lines {
+        set current_line $line
+        if {[string match "*name*" ${current_line}]} {
+            regexp ".* name: (.*)\r" $current_line matched_line name
+        }
+    }
+    return 0
+}
+
+proc sshLogout {id} {
+    send -i $id "exit\n"
+    expect -i $id eof
+    return 0
+}
+
+proc getSystemMetric {id} {
+    global system_metric
+    set cpu_usage               ""
+    set cpu_load_ave_1m         ""
+    set cpu_load_ave_5m         ""
+    set cpu_load_ave_15m        ""
+    set used_mem               	""
+    set free_mem               	""
+
+    send -i $id "show system-cpu\n"
+    expect -i $id "#"
+    set lines [split $expect_out(buffer) \n]
+    set variable [lindex $lines 1]
+    foreach line $lines {
+        set current_line $line
+        if {[string match "*usage*" ${current_line}]} {
+            regexp "usage: *(.*) %" $current_line matched_line cpu_usage
+        } elseif {[string match "*(1m)*" ${current_line}]} {
+            regexp "\\(1m\\): *(.*) %" $current_line matched_line cpu_load_ave_1m
+        } elseif {[string match "*(5m)*" ${current_line}]} {
+            regexp "\\(5m\\): *(.*) %" $current_line matched_line cpu_load_ave_5m
+        } elseif {[string match "*(15m)*" ${current_line}]} {
+            regexp "\\(15m\\): *(.*) %" $current_line matched_line cpu_load_ave_15m
+        }
+    }
+
+    send -i $id "show system-memory\n"
+    expect -i $id "#"
+    set lines [split $expect_out(buffer) \n]
+    set variable [lindex $lines 1]
+    foreach line $lines {
+        set current_line $line
+        if {[string match "*Used*" ${current_line}]} {
+            regexp "memory: *(.*) MB" $current_line matched_line used_mem
+        } elseif {[string match "*Free*" ${current_line}]} {
+            regexp "memory: *(.*) MB" $current_line matched_line free_mem
+        }
+    }
+	set system_metric "$cpu_usage:$cpu_load_ave_1m:$cpu_load_ave_5m:$cpu_load_ave_15m:$used_mem:$free_mem"
+    return 0
+}
+
+proc getNetworkConnectionsMetric {id} {
+    global network_connections_metric
+    set established_connections               ""
+    set syn_sent_connections                  ""
+    set syn_received_connections              ""
+    set fin_wait_1_connections                ""
+    set fin_wait_2_connections                ""
+    set time_wait_connections                 ""
+    set closed_connections                    ""
+    set closed_wait_connections               ""
+    set last_ack_connections                  ""
+    set listen_connections                    ""
+    set closing_connections                   ""
+
+    send -i $id "show tcp-connections\n"
+    expect -i $id "#"
+    set lines [split $expect_out(buffer) \n]
+    set variable [lindex $lines 1]
+    foreach line $lines {
+        set current_line $line
+        if {[string match "*Established*" ${current_line}]} {
+            regexp "Established: *(.*) \r" $current_line matched_line established_connections
+        } elseif {[string match "*Syn-sent*" ${current_line}]} {
+            regexp "Syn-sent: *(.*) \r" $current_line matched_line syn_sent_connections
+        } elseif {[string match "*Syn-received*" ${current_line}]} {
+            regexp "Syn-received: *(.*) \r" $current_line matched_line syn_received_connections
+        } elseif {[string match "*Fin-wait-1*" ${current_line}]} {
+            regexp "Fin-wait-1: *(.*) \r" $current_line matched_line fin_wait_1_connections
+        } elseif {[string match "*Fin-wait-2*" ${current_line}]} {
+            regexp "Fin-wait-2: *(.*) \r" $current_line matched_line fin_wait_2_connections
+        } elseif {[string match "*Time-wait*" ${current_line}]} {
+            regexp "Time-wait: *(.*) \r" $current_line matched_line time_wait_connections
+        } elseif {[string match "*Closed*" ${current_line}]} {
+            regexp "Closed: *(.*) \r" $current_line matched_line closed_connections
+        } elseif {[string match "*Close-wait*" ${current_line}]} {
+            regexp "Close-wait: *(.*) \r" $current_line matched_line closed_wait_connections
+        } elseif {[string match "*Last-ack*" ${current_line}]} {
+            regexp "Last-ack: *(.*) \r" $current_line matched_line last_ack_connections
+        } elseif {[string match "*Listen*" ${current_line}]} {
+            regexp "Listen: *(.*) \r" $current_line matched_line listen_connections
+        } elseif {[string match "*Closing*" ${current_line}]} {
+            regexp "Closing: *(.*) \r" $current_line matched_line closing_connections
+        }
+	}
+	set network_connections_metric "$established_connections:$syn_sent_connections:$syn_received_connections:$fin_wait_1_connections:$fin_wait_2_connections:$time_wait_connections:$closed_connections:$closed_wait_connections:$last_ack_connections:$listen_connections:$closing_connections"
+	return 0
+}
+
+proc getNetworkInterfaceMetric {id} {
+   global network_interface_metric
+   send -i $id "show network-interface\n"
+   expect -i $id "#"
+   set lines [split $expect_out(buffer) \n]
+
+   set skip_count 0
+   set result1 ""
+   set result2 ""
+   set result3 ""
+   set result4 ""
+
+   foreach line $lines {
+      set values [regexp -all -inline {\S+} $line]
+      if {[llength $values] >= 18} {
+         if {$skip_count < 2} {
+            incr skip_count
+            continue
+         }
+         set value3 [lindex $values 2]
+         set value11 [lindex $values 10]
+         set value15 [lindex $values 14]
+
+         set concatenated_values1 "$value3|$value11|$value15"
+         append result1 "$concatenated_values1:"
+
+         set value12 [lindex $values 11]
+         set value16 [lindex $values 15]
+         set concatenated_values2 "$value3|$value12|$value16"
+         append result2 "$concatenated_values2:"
+
+         set value13 [lindex $values 12]
+         set value17 [lindex $values 16]
+         set concatenated_values3 "$value3|$value13|$value17"
+         append result3 "$concatenated_values3:"
+
+         set value14 [lindex $values 13]
+         set value18 [lindex $values 17]
+         set concatenated_values4 "$value3|$value14|$value18"
+         append result4 "$concatenated_values4:"
+      }
+   }
+
+   # Remove the trailing colon and print the final results
+   set network_interface_metric "[string trimright $result1 ":"];[string trimright $result2 ":"];[string trimright $result3 ":"];[string trimright $result4 ":"]"
+}
+
+proc getQMGRStatus {id} {
+    global qmgr_status
+    send -i $id "mqcli\n"
+    expect -i $id "(mqcli)#"
+    send -i $id "dspmq\n"
+    expect -i $id "(mqcli)#"
+
+    set lines [split $expect_out(buffer) \n]
+
+    # Reset qmgr_status
+    set qmgr_status ""
+
+    foreach line $lines {
+        if {[regexp {QMNAME\(([^)]+)\)\s+STATUS\(([^)]+)\)} $line match qmname status]} {
+            # Append to qmgr_status
+            append qmgr_status "$qmname|$status:"
+        }
+    }
+
+    # Remove trailing colon
+    set qmgr_status [string trimright $qmgr_status ":"]
+    send -i $id "exit\n"
+    expect -i $id "#"
+    return 0
+}
+
+proc printApplianceMetric {system_metric network_connections_metric network_interface_metric qmgr_status} {
+    puts "$system_metric;$network_connections_metric;$network_interface_metric;$qmgr_status"
+}
+
+spawn ssh -o StrictHostKeyChecking=no ${appliance1}
+set a1id $spawn_id
+sshLogin $a1id $userid $password appliance1_name
+
+set carry_on_looping 1
+while { $carry_on_looping == 1 } {
+    getSystemMetric $a1id
+    getNetworkConnectionsMetric $a1id
+    getNetworkInterfaceMetric $a1id
+    getQMGRStatus $a1id
+    printApplianceMetric $system_metric $network_connections_metric $network_interface_metric $qmgr_status
+    sleep $pollInterval
+}
+
+sshLogout $a1id
