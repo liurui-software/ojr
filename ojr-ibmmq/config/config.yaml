@@ -1,0 +1,19 @@
+
+instances:
+  - queueManager: VENUS
+    isLocal: true
+    #user: liurui
+    #password: xxxxxxxx
+    #port: 1414
+    queuesMonitored: Q*
+    #customEventQueues:
+    #keystore:
+    #keystorePassword:
+    #cipherSuite: TLS_RSA_WITH_AES_256_CBC_SHA256
+
+    ## Data collector properties:
+    poll.interval: 25
+    callback.interval: 30
+    #otel.backend.url: http://localhost:4318
+    otel.transport: prometheus
+    prometheus.port: 16543
