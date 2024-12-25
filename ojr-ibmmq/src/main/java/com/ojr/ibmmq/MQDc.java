@@ -87,7 +87,7 @@ public class MQDc extends AbstractDc<MQDcConfig> {
         logger.info("Start to collect metrics");
         try {
             mqClient.connect();
-            for(DataQuerier querier : queriers){
+            for (DataQuerier querier : queriers) {
                 querier.collectData();
             }
         } catch (Exception e) {
