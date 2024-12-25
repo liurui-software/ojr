@@ -44,6 +44,7 @@ public class DcUtil {
     public static final String PROMETHEUS_PORT = "prometheus.port";
     public static final int DEFAULT_PROMETHEUS_PORT = 16543; // Default Prometheus port
     public static final String PROMETHEUS_HOST = "prometheus.host";
+    public static final String DEFAULT_PROMETHEUS_HOST = "0.0.0.0";
 
     public final static String OTEL_SERVICE_NAME = "otel.service.name"; // Service name for OpenTelemetry
     public final static String DEFAULT_OTEL_SERVICE_NAME = "OJR"; // Default service name

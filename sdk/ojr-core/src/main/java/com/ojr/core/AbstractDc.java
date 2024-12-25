@@ -1,5 +1,6 @@
 package com.ojr.core;
 
+import com.ojr.core.metric.OjrPrometheusHttpServer;
 import com.ojr.core.metric.RawMetric;
 import com.ojr.core.resources.ContainerResource;
 import io.opentelemetry.api.OpenTelemetry;
@@ -17,17 +18,16 @@ import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporterBuilder;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
-import io.opentelemetry.exporter.prometheus.PrometheusHttpServer;
-import io.opentelemetry.exporter.prometheus.PrometheusHttpServerBuilder;
+import io.opentelemetry.exporter.prometheus.PrometheusMetricReader;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.OpenTelemetrySdkBuilder;
+import io.opentelemetry.sdk.common.export.MemoryMode;
 import io.opentelemetry.sdk.logs.SdkLoggerProvider;
 import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
 import io.opentelemetry.sdk.logs.export.LogRecordExporter;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.SdkMeterProviderBuilder;
 import io.opentelemetry.sdk.metrics.export.MetricExporter;
-import io.opentelemetry.sdk.metrics.export.MetricReader;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
@@ -69,7 +69,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
     private String transport = DcUtil.DEFAULT_OTEL_TRANSPORT;
 
     private int prometheusPort = DcUtil.DEFAULT_PROMETHEUS_PORT;
-    private String prometheusHost = null;
+    private String prometheusHost = DcUtil.DEFAULT_PROMETHEUS_HOST;
 
     private String serviceName = DcUtil.DEFAULT_OTEL_SERVICE_NAME;
     private String serviceInstanceId = null;
@@ -420,14 +420,10 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
         return builder.build();
     }
 
-    private static MetricReader prometheusMetricReader = null;
+    //private static MetricReader prometheusMetricReader = null;
 
-    private static Predicate<String> dftResAttrsFilterForPrometheus = (String key) -> {
-        if (DcUtil.OJR_PLUGIN.equals(key) || HostIncubatingAttributes.HOST_NAME.getKey().equals(key)) {
-            return true;
-        }
-        return false;
-    };
+    private static final Predicate<String> dftResAttrsFilterForPrometheus =
+            (String key) -> DcUtil.OJR_PLUGIN.equals(key) || HostIncubatingAttributes.HOST_NAME.getKey().equals(key);
 
     /**
      * Returns the filter for resource attributes used when exporting metrics to Prometheus.
@@ -440,15 +436,8 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
         return resAttrsFilter;
     }
 
-    /**
-     * Creates and configures a Prometheus metric reader.
-     * <p>
-     * This method sets up a Prometheus HTTP server with a specified port.
-     * Optionally, if a host is provided and not empty, it sets the host as well.
-     *
-     * @return A configured MetricReader instance for Prometheus metrics.
-     */
-    public synchronized MetricReader createPrometheusMetricReader() {
+    /*
+    private synchronized MetricReader createPrometheusMetricReader0() {
         if (prometheusMetricReader != null) {
             return prometheusMetricReader;
         }
@@ -460,6 +449,44 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
         builder.setAllowedResourceAttributesFilter(updateResAttrsFilterForPrometheus(dftResAttrsFilterForPrometheus));
 
         return prometheusMetricReader = builder.build();
+    }
+    */
+
+    private static OjrPrometheusHttpServer prometheusHttpServer = null;
+
+
+    public synchronized OjrPrometheusHttpServer createPrometheusHttpServerIfNotExist() {
+        if (prometheusHttpServer != null) {
+            return prometheusHttpServer; // Return early if the server is already created
+        }
+        prometheusHttpServer = new OjrPrometheusHttpServer(prometheusHost, prometheusPort, null, MemoryMode.REUSABLE_DATA);
+        return prometheusHttpServer;
+    }
+
+    /**
+     * Creates and configures a Prometheus metric reader.
+     * <p>
+     * This method sets up a Prometheus HTTP server with a specified port.
+     * Optionally, if a host is provided and not empty, it sets the host as well.
+     *
+     * @return A configured PrometheusMetricReader instance for Prometheus metrics.
+     */
+    public PrometheusMetricReader createPrometheusMetricReader() {
+        return new PrometheusMetricReader(false, updateResAttrsFilterForPrometheus(dftResAttrsFilterForPrometheus));
+    }
+
+
+    /**
+     * Initializes Prometheus for the OpenTelemetry Meter Provider.
+     *
+     * @param builder The SdkMeterProviderBuilder instance to configure Prometheus.
+     * @return The updated SdkMeterProviderBuilder instance.
+     */
+    public SdkMeterProviderBuilder initPrometheus(SdkMeterProviderBuilder builder) {
+        PrometheusMetricReader reader = createPrometheusMetricReader();
+        builder.registerMetricReader(reader);
+        createPrometheusHttpServerIfNotExist().registerReader(reader).start();
+        return builder;
     }
 
     /**
@@ -476,17 +503,17 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
         if (transport.contains(DcUtil.GRPC)) {
             SdkMeterProviderBuilder builder = SdkMeterProvider.builder().setResource(resource).registerMetricReader(PeriodicMetricReader.builder(createOtlpGrpcMetricExporter(headers, cert)).setInterval(Duration.ofSeconds(callbackInterval)).build());
             if (transport.contains(DcUtil.PROMETHEUS)) {
-                builder.registerMetricReader(createPrometheusMetricReader());
+                initPrometheus(builder);
             }
             return builder.build();
         } else if (transport.contains(DcUtil.HTTP)) {
             SdkMeterProviderBuilder builder = SdkMeterProvider.builder().setResource(resource).registerMetricReader(PeriodicMetricReader.builder(createOtlpHttpMetricExporter(headers, cert)).setInterval(Duration.ofSeconds(callbackInterval)).build());
             if (transport.contains(DcUtil.PROMETHEUS)) {
-                builder.registerMetricReader(createPrometheusMetricReader());
+                initPrometheus(builder);
             }
             return builder.build();
         } else if (transport.contains(DcUtil.PROMETHEUS)) {
-            return SdkMeterProvider.builder().setResource(resource).registerMetricReader(createPrometheusMetricReader()).build();
+            return initPrometheus(SdkMeterProvider.builder().setResource(resource)).build();
         } else {
             return SdkMeterProvider.builder().build();
         }

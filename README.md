@@ -34,12 +34,13 @@ We will provide more receivers in the future and welcome contributions. Right no
   
 | Receiver name | Type | Status | JDK required |
 |---------------|------|--------|--------------|
-| [Dameng Database](ojr-dameng-db/README.md)       | metrics | beta  | Java 8+ |
-| [Oceanbase Database](ojr-oceanbase-db/README.md) | metrics | alpha | Java 8+ |
-| [Informix Database](ojr-informix-db/README.md)   | metrics | alpha | Java 8+ |
-| [Linux Host](ojr-linux-host/README.md)           | metrics | alpha | Java 8+ |
+| [Dameng Database](ojr-dameng-db/README.md)       | metrics | beta  | Java 8+  |
+| [Oceanbase Database](ojr-oceanbase-db/README.md) | metrics | alpha | Java 8+  |
+| [Informix Database](ojr-informix-db/README.md)   | metrics | alpha | Java 8+  |
+| [Linux Host](ojr-linux-host/README.md)           | metrics | alpha | Java 8+  |
 | [SNMP Host](ojr-snmp-host/README.md)             | metrics | alpha | Java 11+ |
-| [IBM MQ Appliance](ojr-mq-appliance/README.md)   | metrics | beta  | Java 8+ |
+| [IBM MQ Appliance](ojr-mq-appliance/README.md)   | metrics | beta  | Java 8+  |
+| [IBM MQ](ojr-ibmmq/README.md)                    | metrics | beta  | Java 8+  |
 
 
 ## Common Parameters for Receivers
