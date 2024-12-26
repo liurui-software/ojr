@@ -43,11 +43,6 @@ cd ojr-mq-appliance-xxx
 
 **Refine configuration file (config/config.yaml) according to your own database.** 
 
-**Note:** You can use DC_CONFIG environment variable to specify other configuration file instead of the default "config/config.yaml". For example:
-```script
-export DC_CONFIG=config/my-config.yaml
-```
-
 **Run the Receiver/Agent synchronously:**
 ```script
 ./bin/ojr-mq-appliance

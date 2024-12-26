@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.ojr"
-version = "0.1.0"
+version = "0.4.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -29,9 +29,9 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
     implementation("org.snmp4j:snmp4j-agent:3.8.1")
 
-    implementation(files("libs/ojr-core-0.1.0.jar"))
-    implementation(files("libs/ojr-snmp-0.1.0.jar"))
-    implementation(files("libs/ojr-host-0.1.0.jar"))
+    implementation(files("libs/ojr-core-0.5.0.jar"))
+    implementation(files("libs/ojr-snmp-0.4.0.jar"))
+    implementation(files("libs/ojr-host-0.5.0.jar"))
 
     testImplementation platform('org.junit:junit-bom:5.11.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'

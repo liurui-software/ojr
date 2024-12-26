@@ -43,7 +43,7 @@ We will provide more receivers in the future and welcome contributions. Right no
 | [IBM MQ](ojr-ibmmq/README.md)                    | metrics | beta  | Java 8+  |
 
 
-## Common Parameters for Receivers
+## Common Parameters for Receivers/Agents
 
 | Parameter | Scope | Description | Default |Examples |
 |-----------|-------|-------------|---------|---------|
@@ -55,5 +55,19 @@ We will provide more receivers in the future and welcome contributions. Right no
 | otel.service.instance.id | instance | The OTel Service instance ID (optional) | N/A | Instana-01 |
 | otel.transport.timeout | instance | The transport timeout in milliseconds (optional) | 10000 | 10000 |
 | otel.transport.delay | instance | The transport delay (used for Batch processor) in milliseconds (optional) | 100 | 100 |
-| prometheus.port | instance | The port of Prometheus endpoint if prometheus is enabled (optional) | 16543 | 16543 |
-| prometheus.host | instance | The host of Prometheus endpoint if prometheus is enabled (optional) | N/A | localhost |
+| prometheus.port | instance | The port of Prometheus endpoint if Prometheus is enabled (optional) | 16543 | 16543 |
+| prometheus.host | instance | The host of Prometheus endpoint if Prometheus is enabled (optional) | N/A | localhost |
+| prometheus.restricted.metrics | instance | The metrics list to be omitted for Prometheus (optional, separated by ",") | N/A | db.sql.elapsed_time,process_cpu_usage |
+
+
+## File paths of configuration files for Receivers/Agents
+
+By default, the configuration file for an OJR agent/receiver is located at `config/config.yaml`. 
+
+OJR is using Java byilt-in JUL for logging which does not have impact on the choice of logging framework used chosed by user when user have OJR built into their own applications. The logging configuration file is by default located at `config/logging.properties`.
+
+User can use `OJR_CONFIG` environment variable or Java system property to specify the path of the configuration file directly. For example, `OJR_CONFIG=/path/to/config1.yaml`.
+
+According to the Java convention, the logging configuration file can also be specified by `java.util.logging.config.file` system property.
+
+User can also just specify the file directory of the OJR configuration file and logging configuration file by `OJR_DIR` environment variable or Java system property. For example, `OJR_DIR=/path/to/config/dir`.
