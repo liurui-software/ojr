@@ -43,11 +43,6 @@ cd ojr-ibmmq-xxx
 
 **Refine configuration file (config/config.yaml) according to your own database.** 
 
-**Note:** You can use DC_CONFIG environment variable to specify other configuration file instead of the default "config/config.yaml". For example:
-```script
-export DC_CONFIG=config/my-config.yaml
-```
-
 Note: If you are using local binding mode, make sure to have the shared library path included into the required environment variable, for example LD_LIBRARY_PATH for Linux.
 For more information, please refer to the documents of IBM MQ. For example:
 ```script

@@ -311,6 +311,27 @@ public interface IDc<Cfg extends BasicDcConfig> {
     void setPrometheusHost(String prometheusHost);
 
     /**
+     * Retrieves the restricted metrics for Prometheus metrics exposure.
+     *
+     * @return The restricted metrics for Prometheus metrics exposure.
+     */
+    String[] getPrometricsMetricRestrictions();
+
+    /**
+     * Sets the restricted metrics for Prometheus metrics exposure.
+     *
+     * @param metricRestrictionString The restricted metrics for Prometheus to be set (separated by ",").
+     */
+    void setPrometricsMetricRestrictions(String metricRestrictionString);
+
+    /**
+     * Sets the restricted metrics for Prometheus metrics exposure.
+     *
+     * @param prometricsMetricRestrictions The restricted metrics for Prometheus to be set.
+     */
+    void setPrometricsMetricRestrictions(String[] prometricsMetricRestrictions);
+
+    /**
      * Retrieves the hostname of the current environment.
      *
      * @return the hostname as a String

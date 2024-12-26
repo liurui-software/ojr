@@ -24,7 +24,7 @@ public class OjrPrometheusHttpServer {
     // HTTP server instance to handle incoming requests
     private HTTPServer httpServer;
 
-    private final PrometheusMergedReader mReader = new PrometheusMergedReader();
+    private final PrometheusMergedReader mReader;
 
     // Prometheus registry to manage and expose metrics
     private final PrometheusRegistry prometheusRegistry = new PrometheusRegistry();
@@ -41,6 +41,7 @@ public class OjrPrometheusHttpServer {
     // Executor service for handling HTTP server tasks
     private final ExecutorService executor;
 
+
     /**
      * Constructor to initialize the Prometheus HTTP server.
      *
@@ -48,17 +49,20 @@ public class OjrPrometheusHttpServer {
      * @param port       Port number for the HTTP server
      * @param executor   Optional executor service for handling tasks
      * @param memoryMode Memory mode configuration
+     * @param prometricsMetricRestrictions The restricted metrics for Prometheus
      */
     public OjrPrometheusHttpServer(
             String host,
             int port,
             @Nullable ExecutorService executor,
-            MemoryMode memoryMode) {
+            MemoryMode memoryMode,
+            String[] prometricsMetricRestrictions) {
 
         this.host = host;
         this.port = port;
         this.memoryMode = memoryMode;
         this.executor = executor;
+        mReader = new PrometheusMergedReader(prometricsMetricRestrictions);
     }
 
     /**
