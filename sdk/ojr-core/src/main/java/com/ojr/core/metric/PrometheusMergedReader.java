@@ -16,8 +16,25 @@ public class PrometheusMergedReader implements MultiCollector {
 
     private final List<PrometheusMetricReader> readers = new ArrayList<>();
 
+    private final String[] metricRestrictions;
+
     public void registerReader(PrometheusMetricReader reader) {
         readers.add(reader);
+    }
+
+    public PrometheusMergedReader(String[] metricRestrictions) {
+        this.metricRestrictions = metricRestrictions;
+    }
+
+    private boolean isMetricRestricted(String metricName) {
+        if (metricRestrictions == null)
+            return false;
+
+        for (String metricRestriction : metricRestrictions) {
+            if (metricRestriction.equals(metricName))
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -30,6 +47,8 @@ public class PrometheusMergedReader implements MultiCollector {
                 if (snapshot == null)
                     continue;
                 String name = snapshot.getMetadata().getName();
+                if (isMetricRestricted(name))
+                    continue;
                 if (snapMap.containsKey(name)) {
                     snapshot = merge(name, snapMap.get(name), snapshot);
                 }

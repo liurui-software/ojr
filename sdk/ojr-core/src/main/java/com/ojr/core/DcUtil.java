@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class DcUtil {
     private static final Logger logger = Logger.getLogger(DcUtil.class.getName());
 
-    public final static String OCR_VERSION = "0.1.0";
+    public final static String OCR_VERSION = "0.5.0";
     public static final String DEFAULT = "default"; // Default key for data points
     public static final String N_A = "N/A";
 
@@ -45,6 +45,7 @@ public class DcUtil {
     public static final int DEFAULT_PROMETHEUS_PORT = 16543; // Default Prometheus port
     public static final String PROMETHEUS_HOST = "prometheus.host";
     public static final String DEFAULT_PROMETHEUS_HOST = "0.0.0.0";
+    public static final String PROMETHEUS_RESTRICTED_METRICS = "prometheus.restricted.metrics";
 
     public final static String OTEL_SERVICE_NAME = "otel.service.name"; // Service name for OpenTelemetry
     public final static String DEFAULT_OTEL_SERVICE_NAME = "OJR"; // Default service name
@@ -61,9 +62,6 @@ public class DcUtil {
     public static final String OTEL_EXPORTER_OTLP_CERTIFICATE = "OTEL_EXPORTER_OTLP_CERTIFICATE"; // Certificate for OTLP exporter
 
     // Configuration files
-    public static final String LOGGING_PROP = "config/logging.properties"; // Logging configuration file
-    public static final String CONFIG_YAML = "config/config.yaml"; // Main configuration file
-    public static final String CONFIG_ENV = "DC_CONFIG"; // Environment variable for configuration
     public static final String OJR_PLUGIN = "ojr"; // Plugin name
 
     /**

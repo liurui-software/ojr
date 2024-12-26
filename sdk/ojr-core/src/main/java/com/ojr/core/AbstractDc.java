@@ -70,6 +70,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
 
     private int prometheusPort = DcUtil.DEFAULT_PROMETHEUS_PORT;
     private String prometheusHost = DcUtil.DEFAULT_PROMETHEUS_HOST;
+    private String[] prometricsMetricRestrictions = null;
 
     private String serviceName = DcUtil.DEFAULT_OTEL_SERVICE_NAME;
     private String serviceInstanceId = null;
@@ -192,6 +193,30 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
     @Override
     public void setPrometheusHost(String prometheusHost) {
         this.prometheusHost = prometheusHost;
+    }
+
+    @Override
+    public String[] getPrometricsMetricRestrictions() {
+        return prometricsMetricRestrictions;
+    }
+
+    @Override
+    public void setPrometricsMetricRestrictions(String metricRestrictionString) {
+        if (metricRestrictionString != null) {
+            String[] restrictions = metricRestrictionString.split(",");
+            prometricsMetricRestrictions = new String[restrictions.length];
+            for (int i = 0; i < restrictions.length; i++) {
+                prometricsMetricRestrictions[i] = restrictions[i].trim();
+            }
+
+        } else {
+            prometricsMetricRestrictions = null;
+        }
+    }
+
+    @Override
+    public void setPrometricsMetricRestrictions(String[] prometricsMetricRestrictions) {
+        this.prometricsMetricRestrictions = prometricsMetricRestrictions;
     }
 
     @Override
@@ -459,7 +484,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
         if (prometheusHttpServer != null) {
             return prometheusHttpServer; // Return early if the server is already created
         }
-        prometheusHttpServer = new OjrPrometheusHttpServer(prometheusHost, prometheusPort, null, MemoryMode.REUSABLE_DATA);
+        prometheusHttpServer = new OjrPrometheusHttpServer(prometheusHost, prometheusPort, null, MemoryMode.REUSABLE_DATA, prometricsMetricRestrictions);
         return prometheusHttpServer;
     }
 
@@ -578,6 +603,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
 
         setPrometheusPort((Integer) properties.getOrDefault(DcUtil.PROMETHEUS_PORT, DcUtil.DEFAULT_PROMETHEUS_PORT));
         setPrometheusHost((String) properties.get(DcUtil.PROMETHEUS_HOST));
+        setPrometricsMetricRestrictions((String) properties.get(DcUtil.PROMETHEUS_RESTRICTED_METRICS));
 
         setServiceName((String) properties.getOrDefault(DcUtil.OTEL_SERVICE_NAME, DcUtil.DEFAULT_OTEL_SERVICE_NAME));
         setServiceInstanceId((String) properties.get(DcUtil.OTEL_SERVICE_INSTANCE_ID));

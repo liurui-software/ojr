@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.ojr"
-version = "0.1.0"
+version = "0.5.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -28,8 +28,8 @@ dependencies {
     api("io.opentelemetry.semconv:opentelemetry-semconv-incubating:1.28.0-alpha")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
 
-    implementation(files("libs/ojr-core-0.1.0.jar"))
-    implementation(files("libs/ojr-vault-all-0.1.0.jar"))
+    implementation(files("libs/ojr-core-0.5.0.jar"))
+    implementation(files("libs/ojr-vault-all-0.4.0.jar"))
 
     testImplementation platform('org.junit:junit-bom:5.11.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'

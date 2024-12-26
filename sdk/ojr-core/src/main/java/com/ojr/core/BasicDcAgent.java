@@ -6,7 +6,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,17 +17,50 @@ import java.util.logging.Logger;
  * The Basic class of Data Collector Agent
  */
 public class BasicDcAgent<Cfg extends BasicDcConfig, Dc extends IDc<Cfg>> {
-    static{
-        if(System.getProperty("java.util.logging.config.file") == null){
+    // Configuration files & paths
+    public static final String DEFAULT_LOGGING_FILE = "logging.properties"; // Default value of Logging configuration file
+    public static final String DEFAULT_CONFIG_FILE = "config.yaml"; // Default value of configuration file
+    public static final String ENV_CONFIG_PATH = "OJR_CONFIG"; // Environment variable for configuration file path
+    public static final String ENV_OJR_DIR = "OJR_DIR"; // Environment variable for configuration file directory
+    public static final String DEFAULT_OJR_DIR = "config"; // Default value of configuration file directory
+
+    public static final String OJR_DIR = getEnvProperty(ENV_OJR_DIR, DEFAULT_OJR_DIR);
+
+    static {
+        if (System.getProperty("java.util.logging.config.file") == null) {
             LogManager logManager = LogManager.getLogManager();
+            File loggingFile = new File(getFullPath(OJR_DIR, DEFAULT_LOGGING_FILE));
             try {
-                logManager.readConfiguration(Files.newInputStream(Paths.get("config/logging.properties")));
+                if (loggingFile.exists()) {
+                    logManager.readConfiguration(Files.newInputStream(loggingFile.toPath()));
+                }
             } catch (IOException e) {
-                System.err.println("Cannot find config/logging.properties!");
-                throw new RuntimeException(e);
+                System.err.println("Cannot open logging config file: " + loggingFile + "!");
             }
         }
     }
+
+    public static String getEnvProperty(String key, String defaultValue) {
+        String value = System.getenv(key);
+        if (value == null) {
+            value = System.getProperty(key);
+        }
+        if (value == null) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
+    public static String getFullPath(String path, String file) {
+        if (path == null)
+            return file;
+
+        if (path.endsWith(File.separator))
+            return path + file;
+
+        return path + File.separator + file;
+    }
+
     private static final Logger logger = Logger.getLogger(BasicDcAgent.class.getName());
 
     private List<Dc> dcs;
@@ -50,15 +82,8 @@ public class BasicDcAgent<Cfg extends BasicDcConfig, Dc extends IDc<Cfg>> {
      * @throws IOException If an I/O error occurs while reading the file.
      */
     public Cfg readConfigYaml(Class<Cfg> clazz) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        String configFile = System.getenv(DcUtil.CONFIG_ENV);
-        if (configFile == null) {
-            configFile = System.getProperty(DcUtil.CONFIG_ENV);
-        }
-        if (configFile == null) {
-            configFile = DcUtil.CONFIG_YAML;
-        }
-        return objectMapper.readValue(new File(configFile), clazz);
+        String configFile = getEnvProperty(ENV_CONFIG_PATH, getFullPath(OJR_DIR, DEFAULT_CONFIG_FILE));
+        return new ObjectMapper(new YAMLFactory()).readValue(new File(configFile), clazz);
     }
 
     /**
@@ -73,7 +98,7 @@ public class BasicDcAgent<Cfg extends BasicDcConfig, Dc extends IDc<Cfg>> {
      * Initializes the agent with configuration and data collector classes.
      *
      * @param cfgClass The class of the configuration object.
-     * @param dcClass The class of the data collector object.
+     * @param dcClass  The class of the data collector object.
      * @throws Exception If an error occurs during initialization.
      */
     public void initEnv(Class<Cfg> cfgClass, Class<Dc> dcClass) throws Exception {
