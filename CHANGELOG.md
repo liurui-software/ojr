@@ -1,9 +1,11 @@
 Changelog
 ==========
 
-_2024-12-18_
+## OJR Release v0.6.0
 
-- Initial release of the OJR
+- Handled cardinality related concerns
 
 
+## OJR Release v0.5.0 
 
+- Sorted out configuration related issues
