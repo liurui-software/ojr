@@ -1,6 +1,7 @@
 package com.ojr.core.metric;
 
 import com.ojr.core.DcUtil;
+import com.ojr.core.IDc;
 import io.opentelemetry.api.metrics.DoubleHistogram;
 import io.opentelemetry.api.metrics.LongHistogram;
 
@@ -28,12 +29,13 @@ public class RawMetric {
     private final Map<String, DataPoint> dps = new ConcurrentHashMap<>(); // Data points associated with the metric
     private static final long DEFAULT_OUTDATED_TIME = 125000L; // Default time after which data points are considered outdated
     private long outdatedTime = DEFAULT_OUTDATED_TIME; // Time after which data points are considered outdated
-    private boolean clearDps = false; // Flag to indicate whether to clear data points
     private final String meterName; // Name of the meter associated with the metric
     private List<Long> longBucketBoundaries = null; // Bucket boundaries for long histograms
     private List<Double> doubleBucketBoundaries = null; // Bucket boundaries for double histograms
     private LongHistogram longHistogram = null; // Long histogram for recording long values
     private DoubleHistogram doubleHistogram = null; // Double histogram for recording double values
+
+    private IDc<?> dc = null;
 
     /**
      * Constructs a new RawMetric with specified parameters.
@@ -70,6 +72,14 @@ public class RawMetric {
      */
     public RawMetric(MetricInstrumentType instrumentType, String name, String description, String unit, boolean isInteger, String attributeKey) {
         this(instrumentType, name, description, unit, isInteger, attributeKey, DcUtil.DEFAULT);
+    }
+
+    public IDc<?> getDc() {
+        return dc;
+    }
+
+    public void setDc(IDc<?> dc) {
+        this.dc = dc;
     }
 
     /**
@@ -292,9 +302,11 @@ public class RawMetric {
      */
     public RawMetric setValue(Number value) {
         if (longHistogram != null) {
-            longHistogram.record(value.longValue());
+            if (dc.preRecordMetric(name, value, null))
+                longHistogram.record(value.longValue());
         } else if (doubleHistogram != null) {
-            doubleHistogram.record(value.doubleValue());
+            if (dc.preRecordMetric(name, value, null))
+                doubleHistogram.record(value.doubleValue());
         } else {
             getDataPoint(null).setValue(value);
         }
@@ -310,9 +322,11 @@ public class RawMetric {
      */
     public RawMetric setValue(Number value, Map<String, Object> attributes) {
         if (longHistogram != null) {
-            longHistogram.record(value.longValue(), DcUtil.convertMapToAttributes(attributes));
+            if (dc.preRecordMetric(name, value, attributes))
+                longHistogram.record(value.longValue(), DcUtil.convertMapToAttributes(attributes));
         } else if (doubleHistogram != null) {
-            doubleHistogram.record(value.doubleValue(), DcUtil.convertMapToAttributes(attributes));
+            if (dc.preRecordMetric(name, value, attributes))
+                doubleHistogram.record(value.doubleValue(), DcUtil.convertMapToAttributes(attributes));
         } else {
             getDataPoint(null).setValue(value, attributes);
         }
@@ -328,9 +342,11 @@ public class RawMetric {
     public RawMetric setValue(MetricQueryResult result) {
         if (result != null) {
             if (longHistogram != null) {
-                longHistogram.record(result.getValue().longValue(), DcUtil.convertMapToAttributes(result.getAttributes()));
+                if (dc.preRecordMetric(name, result.getValue(), result.getAttributes()))
+                    longHistogram.record(result.getValue().longValue(), DcUtil.convertMapToAttributes(result.getAttributes()));
             } else if (doubleHistogram != null) {
-                doubleHistogram.record(result.getValue().doubleValue(), DcUtil.convertMapToAttributes(result.getAttributes()));
+                if (dc.preRecordMetric(name, result.getValue(), result.getAttributes()))
+                    doubleHistogram.record(result.getValue().doubleValue(), DcUtil.convertMapToAttributes(result.getAttributes()));
             } else {
                 getDataPoint(result.getKey()).setValue(result);
             }
@@ -348,34 +364,16 @@ public class RawMetric {
         if (results != null) {
             for (MetricQueryResult result : results) {
                 if (longHistogram != null) {
-                    longHistogram.record(result.getValue().longValue(), DcUtil.convertMapToAttributes(result.getAttributes()));
+                    if (dc.preRecordMetric(name, result.getValue(), result.getAttributes()))
+                        longHistogram.record(result.getValue().longValue(), DcUtil.convertMapToAttributes(result.getAttributes()));
                 } else if (doubleHistogram != null) {
-                    doubleHistogram.record(result.getValue().doubleValue(), DcUtil.convertMapToAttributes(result.getAttributes()));
+                    if (dc.preRecordMetric(name, result.getValue(), result.getAttributes()))
+                        doubleHistogram.record(result.getValue().doubleValue(), DcUtil.convertMapToAttributes(result.getAttributes()));
                 } else {
                     getDataPoint(result.getKey()).setValue(result);
                 }
             }
         }
-        return this;
-    }
-
-    /**
-     * Checks if data points should be cleared.
-     *
-     * @return True if data points should be cleared, false otherwise
-     */
-    public boolean isClearDps() {
-        return clearDps;
-    }
-
-    /**
-     * Sets the flag to indicate whether to clear data points.
-     *
-     * @param clearDps Flag to indicate whether to clear data points
-     * @return This RawMetric instance
-     */
-    public RawMetric setClearDps(boolean clearDps) {
-        this.clearDps = clearDps;
         return this;
     }
 

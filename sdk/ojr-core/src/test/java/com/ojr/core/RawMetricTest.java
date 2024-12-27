@@ -74,12 +74,6 @@ public class RawMetricTest {
     }
 
     @Test
-    public void testSetClearDps_ShouldSetAndGetCorrectClearDps() {
-        rawMetric.setClearDps(true);
-        assertTrue(rawMetric.isClearDps());
-    }
-
-    @Test
     public void testGetDataPoint_WithNullKey_ShouldReturnDefaultDataPoint() {
         assertNotNull(rawMetric.getDataPoint(null));
     }

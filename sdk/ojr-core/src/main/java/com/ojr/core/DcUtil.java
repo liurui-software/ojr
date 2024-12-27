@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class DcUtil {
     private static final Logger logger = Logger.getLogger(DcUtil.class.getName());
 
-    public final static String OCR_VERSION = "0.5.0";
+    public final static String OCR_VERSION = "0.6.0";
     public static final String DEFAULT = "default"; // Default key for data points
     public static final String N_A = "N/A";
 
@@ -46,6 +46,8 @@ public class DcUtil {
     public static final String PROMETHEUS_HOST = "prometheus.host";
     public static final String DEFAULT_PROMETHEUS_HOST = "0.0.0.0";
     public static final String PROMETHEUS_RESTRICTED_METRICS = "prometheus.restricted.metrics";
+
+    public static final String OTEL_RESTRICTED_METRICS = "otel.restricted.metrics";
 
     public final static String OTEL_SERVICE_NAME = "otel.service.name"; // Service name for OpenTelemetry
     public final static String DEFAULT_OTEL_SERVICE_NAME = "OJR"; // Default service name
@@ -162,35 +164,30 @@ public class DcUtil {
      *
      * @param meters    The map of meters.
      * @param rawMetric The raw metric to register.
+     * @param dc        The data collector.
      */
-    public static void registerMetric(Map<String, Meter> meters, RawMetric rawMetric) {
+    public static void registerMetric(Map<String, Meter> meters, RawMetric rawMetric, IDc<?> dc) {
         Consumer<ObservableLongMeasurement> recordLongMetric = measurement -> {
             rawMetric.purgeOutdatedDps();
-            boolean clearDps = rawMetric.isClearDps();
-            Iterator<Map.Entry<String, RawMetric.DataPoint>> iterator = rawMetric.getDataPoints().entrySet().iterator();
-            while (iterator.hasNext()) {
-                RawMetric.DataPoint dp = iterator.next().getValue();
-                Long value = dp.getLongValue();
-                if (value == null)
-                    continue;
-                measurement.record(value, convertMapToAttributes(dp.getAttributes()));
-                if (clearDps) {
-                    iterator.remove();
+            if (dc.preRecordMetric(rawMetric)) {
+                for (Map.Entry<String, RawMetric.DataPoint> stringDataPointEntry : rawMetric.getDataPoints().entrySet()) {
+                    RawMetric.DataPoint dp = stringDataPointEntry.getValue();
+                    Long value = dp.getLongValue();
+                    if (value == null)
+                        continue;
+                    measurement.record(value, convertMapToAttributes(dp.getAttributes()));
                 }
             }
         };
         Consumer<ObservableDoubleMeasurement> recordDoubleMetric = measurement -> {
             rawMetric.purgeOutdatedDps();
-            boolean clearDps = rawMetric.isClearDps();
-            Iterator<Map.Entry<String, RawMetric.DataPoint>> iterator = rawMetric.getDataPoints().entrySet().iterator();
-            while (iterator.hasNext()) {
-                RawMetric.DataPoint dp = iterator.next().getValue();
-                Double value = dp.getDoubleValue();
-                if (value == null)
-                    continue;
-                measurement.record(value, convertMapToAttributes(dp.getAttributes()));
-                if (clearDps) {
-                    iterator.remove();
+            if (dc.preRecordMetric(rawMetric)) {
+                for (Map.Entry<String, RawMetric.DataPoint> stringDataPointEntry : rawMetric.getDataPoints().entrySet()) {
+                    RawMetric.DataPoint dp = stringDataPointEntry.getValue();
+                    Double value = dp.getDoubleValue();
+                    if (value == null)
+                        continue;
+                    measurement.record(value, convertMapToAttributes(dp.getAttributes()));
                 }
             }
         };
@@ -239,6 +236,8 @@ public class DcUtil {
             default:
                 logger.log(Level.WARNING, "Currently only following instrument types are supported, Gauge, Counter, UpDownCounter, while your type is {0}", rawMetric.getInstrumentType());
         }
+
+        rawMetric.setDc(dc);
     }
 
     /**

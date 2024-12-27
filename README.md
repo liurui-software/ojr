@@ -55,6 +55,7 @@ We will provide more receivers in the future and welcome contributions. Right no
 | otel.service.instance.id | instance | The OTel Service instance ID (optional) | N/A | Instana-01 |
 | otel.transport.timeout | instance | The transport timeout in milliseconds (optional) | 10000 | 10000 |
 | otel.transport.delay | instance | The transport delay (used for Batch processor) in milliseconds (optional) | 100 | 100 |
+| otel.restricted.metrics | instance | The metrics list to be omitted to be sent to backend | N/A | db.sql.elapsed_time,process_cpu_usage |
 | prometheus.port | instance | The port of Prometheus endpoint if Prometheus is enabled (optional) | 16543 | 16543 |
 | prometheus.host | instance | The host of Prometheus endpoint if Prometheus is enabled (optional) | N/A | localhost |
 | prometheus.restricted.metrics | instance | The metrics list to be omitted for Prometheus (optional, separated by ",") | N/A | db.sql.elapsed_time,process_cpu_usage |

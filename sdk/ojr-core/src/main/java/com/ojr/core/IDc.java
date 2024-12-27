@@ -2,6 +2,7 @@ package com.ojr.core;
 
 import com.ojr.core.metric.RawMetric;
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.sdk.logs.SdkLoggerProvider;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
@@ -58,6 +59,30 @@ public interface IDc<Cfg extends BasicDcConfig> {
      * Registers metrics with the system.
      */
     void registerMetrics();
+
+    /**
+     * Before record a metric.
+     * <p>
+     * This method is used to prepare or validate the recording of a metric before it is officially recorded.
+     * It can be used to perform any necessary checks or preprocessing steps. Return false to bypass the recoding
+     *
+     * @param rawMetric The metric to be recorded.
+     * @return true if the pre-recording is successful, false to bypass the recoding.
+     */
+    boolean preRecordMetric(RawMetric rawMetric);
+
+    /**
+     * Before record a metric with the given name, value, and attributes. Primarily used for Histogram metrics.
+     * <p>
+     * This method is used to prepare or validate the recording of a metric before it is officially recorded.
+     * It can be used to perform any necessary checks or preprocessing steps. Return false to bypass the recoding
+     *
+     * @param metricName The name of the metric to be recorded.
+     * @param value      The value of the metric.
+     * @param attributes Additional attributes associated with the metric.
+     * @return true if the pre-recording is successful, false to bypass the recoding.
+     */
+    boolean preRecordMetric(String metricName, Number value,  Map<String, Object> attributes);
 
     /**
      * Collects data from the data collection system.
@@ -118,7 +143,7 @@ public interface IDc<Cfg extends BasicDcConfig> {
      * readExtraParameters, initOnce, processParameters.
      *
      * @param properties A map containing various properties as key-value pairs.
-     * @param config An instance of Cfg containing configuration settings.
+     * @param config     An instance of Cfg containing configuration settings.
      */
     void readBuiltinParameters(Map<String, Object> properties, Cfg config);
 
@@ -127,7 +152,7 @@ public interface IDc<Cfg extends BasicDcConfig> {
      * readExtraParameters, initOnce, processParameters.
      *
      * @param properties A map containing various properties as key-value pairs.
-     * @param config An instance of Cfg containing configuration settings.
+     * @param config     An instance of Cfg containing configuration settings.
      */
     void readExtraParameters(Map<String, Object> properties, Cfg config);
 
@@ -141,7 +166,7 @@ public interface IDc<Cfg extends BasicDcConfig> {
      * Process parameters. The default order of execution is: readBuiltinParameters, readExtraParameters, initOnce, processParameters.
      *
      * @param properties A map containing various properties as key-value pairs.
-     * @param config An instance of Cfg containing configuration settings.
+     * @param config     An instance of Cfg containing configuration settings.
      */
     void processParameters(Map<String, Object> properties, Cfg config) throws Exception;
 
@@ -149,8 +174,8 @@ public interface IDc<Cfg extends BasicDcConfig> {
      * Initializes the OpenTelemetry engine with specified features.
      *
      * @param useMetrics a flag indicating whether to enable metrics collection
-     * @param useTraces a flag indicating whether to enable trace collection
-     * @param useLogs a flag indicating whether to enable log collection
+     * @param useTraces  a flag indicating whether to enable trace collection
+     * @param useLogs    a flag indicating whether to enable log collection
      */
     void initOTelEngine(boolean useMetrics, boolean useTraces, boolean useLogs);
 
@@ -315,21 +340,42 @@ public interface IDc<Cfg extends BasicDcConfig> {
      *
      * @return The restricted metrics for Prometheus metrics exposure.
      */
-    String[] getPrometricsMetricRestrictions();
+    String[] getPrometheusMetricRestrictions();
 
     /**
      * Sets the restricted metrics for Prometheus metrics exposure.
      *
      * @param metricRestrictionString The restricted metrics for Prometheus to be set (separated by ",").
      */
-    void setPrometricsMetricRestrictions(String metricRestrictionString);
+    void setPrometheusMetricRestrictions(String metricRestrictionString);
 
     /**
      * Sets the restricted metrics for Prometheus metrics exposure.
      *
-     * @param prometricsMetricRestrictions The restricted metrics for Prometheus to be set.
+     * @param prometheusMetricRestrictions The restricted metrics for Prometheus to be set.
      */
-    void setPrometricsMetricRestrictions(String[] prometricsMetricRestrictions);
+    void setPrometheusMetricRestrictions(String[] prometheusMetricRestrictions);
+
+    /**
+     * Retrieves the restricted metrics
+     *
+     * @return The restricted metrics
+     */
+    String[] getMetricRestrictions();
+
+    /**
+     * Sets the restricted metrics
+     *
+     * @param metricRestrictionString The restricted metrics to be set (separated by ",").
+     */
+    void setMetricRestrictions(String metricRestrictionString);
+
+    /**
+     * Sets the restricted metrics.
+     *
+     * @param metricRestrictions The restricted metrics to be set.
+     */
+    void setMetricRestrictions(String[] metricRestrictions);
 
     /**
      * Retrieves the hostname of the current environment.

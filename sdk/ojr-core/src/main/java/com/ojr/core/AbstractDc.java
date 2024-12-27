@@ -43,6 +43,7 @@ import io.opentelemetry.semconv.incubating.ServiceIncubatingAttributes;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -70,7 +71,9 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
 
     private int prometheusPort = DcUtil.DEFAULT_PROMETHEUS_PORT;
     private String prometheusHost = DcUtil.DEFAULT_PROMETHEUS_HOST;
-    private String[] prometricsMetricRestrictions = null;
+    private String[] prometheusMetricRestrictions = null;
+
+    private String[] metricRestrictions = null;
 
     private String serviceName = DcUtil.DEFAULT_OTEL_SERVICE_NAME;
     private String serviceInstanceId = null;
@@ -196,33 +199,52 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
     }
 
     @Override
-    public String[] getPrometricsMetricRestrictions() {
-        return prometricsMetricRestrictions;
+    public String[] getPrometheusMetricRestrictions() {
+        return prometheusMetricRestrictions;
     }
 
-    @Override
-    public void setPrometricsMetricRestrictions(String metricRestrictionString) {
+    private String[] parseMetricRestrictions(String metricRestrictionString) {
+        String[] restrictions = null;
+
         if (metricRestrictionString != null) {
-            String[] restrictions = metricRestrictionString.split(",");
-            prometricsMetricRestrictions = new String[restrictions.length];
-            for (int i = 0; i < restrictions.length; i++) {
-                prometricsMetricRestrictions[i] = restrictions[i].trim();
+            String[] restrictions0 = metricRestrictionString.split(",");
+            restrictions = new String[restrictions0.length];
+            for (int i = 0; i < restrictions0.length; i++) {
+                restrictions[i] = restrictions0[i].trim();
             }
 
-        } else {
-            prometricsMetricRestrictions = null;
         }
+        return restrictions;
     }
 
     @Override
-    public void setPrometricsMetricRestrictions(String[] prometricsMetricRestrictions) {
-        this.prometricsMetricRestrictions = prometricsMetricRestrictions;
+    public void setPrometheusMetricRestrictions(String metricRestrictionString) {
+        prometheusMetricRestrictions = parseMetricRestrictions(metricRestrictionString);
+    }
+
+    @Override
+    public void setPrometheusMetricRestrictions(String[] prometricsMetricRestrictions) {
+        this.prometheusMetricRestrictions = prometricsMetricRestrictions;
+    }
+
+    @Override
+    public String[] getMetricRestrictions() {
+        return metricRestrictions;
+    }
+
+    @Override
+    public void setMetricRestrictions(String metricRestrictionString) {
+        metricRestrictions = parseMetricRestrictions(metricRestrictionString);
+    }
+
+    @Override
+    public void setMetricRestrictions(String[] MetricRestrictions) {
+        this.metricRestrictions = MetricRestrictions;
     }
 
     @Override
     public String getHostname() {
-        if (hostname != null)
-            return hostname;
+        if (hostname != null) return hostname;
 
         try {
             hostname = InetAddress.getLocalHost().getHostName();
@@ -243,8 +265,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
 
     @Override
     public long getPid() {
-        if (pid != null)
-            return pid;
+        if (pid != null) return pid;
 
         pid = DcUtil.getPid();
         return pid;
@@ -257,8 +278,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
 
     @Override
     public String getContainerId() {
-        if (containerId != null)
-            return containerId;
+        if (containerId != null) return containerId;
 
         containerId = new ContainerResource().getContainerId().orElse(DcUtil.N_A);
         return containerId;
@@ -289,8 +309,22 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
     public void registerMetrics() {
         // Iterate through the raw metrics and register each one
         for (RawMetric rawMetric : rawMetricsMap.values()) {
-            DcUtil.registerMetric(meters, rawMetric);
+            DcUtil.registerMetric(meters, rawMetric, this);
         }
+    }
+
+    @Override
+    public boolean preRecordMetric(RawMetric rawMetric) {
+        if (metricRestrictions == null) return true;
+
+        return !Arrays.asList(metricRestrictions).contains(rawMetric.getName());
+    }
+
+    @Override
+    public boolean preRecordMetric(String metricName, Number value, Map<String, Object> attributes) {
+        if (metricRestrictions == null) return true;
+
+        return !Arrays.asList(metricRestrictions).contains(metricName);
     }
 
     /**
@@ -447,8 +481,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
 
     //private static MetricReader prometheusMetricReader = null;
 
-    private static final Predicate<String> dftResAttrsFilterForPrometheus =
-            (String key) -> DcUtil.OJR_PLUGIN.equals(key) || HostIncubatingAttributes.HOST_NAME.getKey().equals(key);
+    private static final Predicate<String> dftResAttrsFilterForPrometheus = (String key) -> DcUtil.OJR_PLUGIN.equals(key) || HostIncubatingAttributes.HOST_NAME.getKey().equals(key);
 
     /**
      * Returns the filter for resource attributes used when exporting metrics to Prometheus.
@@ -484,7 +517,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
         if (prometheusHttpServer != null) {
             return prometheusHttpServer; // Return early if the server is already created
         }
-        prometheusHttpServer = new OjrPrometheusHttpServer(prometheusHost, prometheusPort, null, MemoryMode.REUSABLE_DATA, prometricsMetricRestrictions);
+        prometheusHttpServer = new OjrPrometheusHttpServer(prometheusHost, prometheusPort, null, MemoryMode.REUSABLE_DATA, prometheusMetricRestrictions);
         return prometheusHttpServer;
     }
 
@@ -601,9 +634,11 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
         setBackendUrl((String) properties.getOrDefault(DcUtil.OTEL_BACKEND_URL, DcUtil.DEFAULT_OTEL_BACKEND_URL));
         setTransport((String) properties.getOrDefault(DcUtil.OTEL_TRANSPORT, DcUtil.DEFAULT_OTEL_TRANSPORT));
 
+        setMetricRestrictions((String) properties.get(DcUtil.OTEL_RESTRICTED_METRICS));
+
         setPrometheusPort((Integer) properties.getOrDefault(DcUtil.PROMETHEUS_PORT, DcUtil.DEFAULT_PROMETHEUS_PORT));
         setPrometheusHost((String) properties.get(DcUtil.PROMETHEUS_HOST));
-        setPrometricsMetricRestrictions((String) properties.get(DcUtil.PROMETHEUS_RESTRICTED_METRICS));
+        setPrometheusMetricRestrictions((String) properties.get(DcUtil.PROMETHEUS_RESTRICTED_METRICS));
 
         setServiceName((String) properties.getOrDefault(DcUtil.OTEL_SERVICE_NAME, DcUtil.DEFAULT_OTEL_SERVICE_NAME));
         setServiceInstanceId((String) properties.get(DcUtil.OTEL_SERVICE_INSTANCE_ID));
@@ -647,8 +682,7 @@ public abstract class AbstractDc<Cfg extends BasicDcConfig> implements IDc<Cfg> 
      * @return a Resource object containing the attributes.
      */
     public Resource retrieveResourceAttributes() {
-        Resource resource = Resource.create(Attributes.of(ServiceAttributes.SERVICE_NAME, serviceName, TelemetryAttributes.TELEMETRY_SDK_NAME, "ojr",
-                TelemetryAttributes.TELEMETRY_SDK_LANGUAGE, "java", TelemetryAttributes.TELEMETRY_SDK_VERSION, DcUtil.OCR_VERSION));
+        Resource resource = Resource.create(Attributes.of(ServiceAttributes.SERVICE_NAME, serviceName, TelemetryAttributes.TELEMETRY_SDK_NAME, "ojr", TelemetryAttributes.TELEMETRY_SDK_LANGUAGE, "java", TelemetryAttributes.TELEMETRY_SDK_VERSION, DcUtil.OCR_VERSION));
 
         ResourceEnricher enricher = new ResourceEnricher(resource);
         enricher.enrich(ServiceIncubatingAttributes.SERVICE_INSTANCE_ID, serviceInstanceId);
