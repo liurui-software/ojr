@@ -72,3 +72,12 @@ User can use `OJR_CONFIG` environment variable or Java system property to specif
 According to the Java convention, the logging configuration file can also be specified by `java.util.logging.config.file` system property.
 
 User can also just specify the file directory of the OJR configuration file and logging configuration file by `OJR_DIR` environment variable or Java system property. For example, `OJR_DIR=/path/to/config/dir`.
+
+
+## Some advanced configurations
+
+OJR recognizes the following standard OpenTelemetry environment variables:
+
+- `OTEL_RESOURCE_ATTRIBUTES` is used to add more OpenTelemetry resource attributes. For example, OTEL_RESOURCE_ATTRIBUTES="custom.bizID=xxx,customer.bizName=yyy".
+- `OTEL_EXPORTER_OTLP_HEADERS` is used to add more HTTP headers to the built-in OTLP exporter. For example, OTEL_EXPORTER_OTLP_HEADERS="api-key=key,other-config-value=value".
+- `OTEL_EXPORTER_OTLP_CERTIFICATE` is used to specify the path of the certificate file for the built-in OTLP exporter. For example, OTEL_EXPORTER_OTLP_CERTIFICATE='/tmp/lr/servercert.cer'.

@@ -12,8 +12,8 @@ instances:
     #cipherSuite: TLS_RSA_WITH_AES_256_CBC_SHA256
 
     ## Data collector properties:
-    poll.interval: 25
-    callback.interval: 30
+    otel.poll.interval: 25
+    otel.callback.interval: 30
     #otel.backend.url: http://localhost:4318
     otel.transport: prometheus
     prometheus.port: 16543
@@ -22,6 +22,7 @@ instances:
     isLocal: false
     #user: liurui
     #password: xxxxxxxx
+    #host: 192.168.1.1
     #port: 1414
     queuesMonitored: Q*
     #customEventQueues:
@@ -30,8 +31,8 @@ instances:
     #cipherSuite: TLS_RSA_WITH_AES_256_CBC_SHA256
 
     ## Data collector properties:
-    poll.interval: 25
-    callback.interval: 30
+    otel.poll.interval: 25
+    otel.callback.interval: 30
     #otel.backend.url: http://localhost:4318
     otel.transport: prometheus
     prometheus.port: 16543

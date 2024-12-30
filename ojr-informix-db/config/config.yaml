@@ -18,7 +18,7 @@ instances:
     otel.service.name: InformixDB
 
     #Data collector properties:
-    #Either use `poll.interval` or `custom.poll.interval`
+    #Either use `otel.poll.interval` or `custom.poll.interval`
     otel.poll.interval: 25
     #All three category value is Mandatory if leveraging Custom Poll Rate
     custom.poll.interval:

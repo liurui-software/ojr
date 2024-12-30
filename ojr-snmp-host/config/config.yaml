@@ -2,8 +2,8 @@ host.system: snmp_host
 
 instances:
   - snmp.host: udp:9.30.78.59/161
-    poll.interval: 25
-    callback.interval: 30
+    otel.poll.interval: 25
+    otel.callback.interval: 30
     #otel.backend.url: http://localhost:4317
     otel.backend.url: http://localhost:4318
     otel.transport: http+prometheus

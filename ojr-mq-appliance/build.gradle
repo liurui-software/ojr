@@ -45,8 +45,10 @@ applicationDistribution.from("config") {
 }
 
 applicationDistribution.from("logs") {
+    include "PLACE_HOLDER"
     into "logs"
 }
+
 
 applicationDistribution.from("scripts") {
     into "scripts"
