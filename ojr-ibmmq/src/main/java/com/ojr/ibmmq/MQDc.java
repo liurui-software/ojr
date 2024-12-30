@@ -6,6 +6,8 @@ import com.ojr.core.ResourceEnricher;
 import com.ojr.core.metric.RawMetric;
 import com.ojr.ibmmq.mqclient.DataQuerier;
 import com.ojr.ibmmq.mqclient.MQClient;
+import com.ojr.ibmmq.mqclient.queriers.ChannelQuerier;
+import com.ojr.ibmmq.mqclient.queriers.ListenerQuerier;
 import com.ojr.ibmmq.mqclient.queriers.QmgrQuerier;
 import com.ojr.ibmmq.mqclient.queriers.QueueQuerier;
 
@@ -66,6 +68,8 @@ public class MQDc extends AbstractDc<MQDcConfig> {
         mqClient = new MQClient(this);
         registerQuerier(new QmgrQuerier(mqClient));
         registerQuerier(new QueueQuerier(mqClient, queuesMonitored));
+        registerQuerier(new ListenerQuerier(mqClient));
+        registerQuerier(new ChannelQuerier(mqClient));
     }
 
     @Override
