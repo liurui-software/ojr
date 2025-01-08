@@ -4,7 +4,9 @@ instances:
     isLocal: true
     #user: liurui
     #password: xxxxxxxx
+    #host: 192.168.1.1
     #port: 1414
+    #channel: SYSTEM.ADMIN.SVRCONN
     queuesMonitored: Q*
     #customEventQueues:
     #keystore:
@@ -19,11 +21,12 @@ instances:
     prometheus.port: 16543
 
   - queueManager: SATURN
-    isLocal: false
+    isLocal: true
     #user: liurui
     #password: xxxxxxxx
     #host: 192.168.1.1
     #port: 1414
+    #channel: SYSTEM.ADMIN.SVRCONN
     queuesMonitored: Q*
     #customEventQueues:
     #keystore:
