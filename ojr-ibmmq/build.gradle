@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.ojr"
-version = "0.1.2"
+version = "0.1.3"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -30,7 +30,7 @@ dependencies {
     implementation('org.apache.commons:commons-lang3:3.17.0')
     implementation('com.ibm.mq:com.ibm.mq.allclient:9.4.1.1')
 
-    implementation(files("libs/ojr-core-0.6.0.jar"))
+    implementation(files("libs/ojr-core-0.6.1.jar"))
 
     testImplementation platform('org.junit:junit-bom:5.11.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'

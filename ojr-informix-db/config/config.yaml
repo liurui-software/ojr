@@ -16,6 +16,7 @@ instances:
 
     #OTel properties:
     otel.service.name: InformixDB
+    prometheus.restricted.metrics: db.sql.elapsed_time,db.lock.time
 
     #Data collector properties:
     #Either use `otel.poll.interval` or `custom.poll.interval`

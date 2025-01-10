@@ -18,6 +18,7 @@ instances:
     otel.backend.url: http://localhost:4318
     otel.transport: http+prometheus
     prometheus.port: 16543
+    prometheus.restricted.metrics: db.sql.elapsed_time,db.lock.time
     otel.service.name: OBCluster1
     otel.service.instance.id: cluster@OBCluster1
 
@@ -37,5 +38,6 @@ instances:
     otel.backend.url: http://localhost:4318
     otel.transport: http+prometheus
     prometheus.port: 16543
+    prometheus.restricted.metrics: db.sql.elapsed_time,db.lock.time
     otel.service.name: OBCluster1
     otel.service.instance.id: test1@OBCluster1

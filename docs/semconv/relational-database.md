@@ -67,6 +67,7 @@ This page tries to describe a semantic convention for the attributes and metrics
 
 
 ## Resource attributes
+
 ### Database
 Resource attributes for database and instance entity.
 
@@ -82,10 +83,11 @@ Resource attributes for database and instance entity.
 | `db.entity.parent.id` | string | This attribute is used to describe the parent entity ID of the current object and consists of server.address, server.port and db.name or instance.name together. | db.testdb.com:5236@db2inst1   | Conditionally Required: If applicable.     |
 | `db.entity.type`      | string | This attribute is used to describe the type of the current object.                                                                                               | DATABASE, INSTANCE            | Conditionally Required: If applicable.     |
 ### Notes:
-
 - All metrics in `db.database` instruments should be attached to a Database resource and therefore inherit its attributes, like `db.database.system`.
 - All metrics in `db.instance` instruments should be attached to a [Instance resource](../database/instance-metrics.md) and therefore inherit its attributes, like `db.instance.name`.
+
 ## Availability Metrics
+
 ### Metric: `db.status`
 This metric is [required](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#required).
 
@@ -106,80 +108,95 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 | Name                        | Instrument Type | Units (UCUM)  | Description                                        |
 |-----------------------------|-----------------|---------------|----------------------------------------------------|
 | `db.instance.active.count`  | UpDownCounter   | `{instance}`  | The total number of active instances of database.  |
+
 ## Throughput Metrics
+
 ### Metric: `db.session.count`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name                       | Instrument Type | Units (UCUM) | Description                       |
 |----------------------------|-----------------|--------------|-----------------------------------|
 | `db.session.count`         | UpDownCounter   | `{session}`  | The number of database sessions.  |
+
 ### Metric: `db.session.active.count`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name                       | Instrument Type | Units (UCUM)  | Description                              |
 |----------------------------|-----------------|---------------|------------------------------------------|
 | `db.session.active.count`  | UpDownCounter   | `{session}`   | The number of active database sessions.  |
+
 ### Metric: `db.transaction.count`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name                     | Instrument Type | Units (UCUM)     | Description                            |
 |--------------------------|-----------------|------------------|----------------------------------------|
 | `db.transaction.count`   | UpDownCounter   | `{transaction}`  | The number of completed transactions.  |
+
 ### Metric: `db.transaction.rate`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name                  | Instrument Type | Units (UCUM)     | Description                           |
 |-----------------------|-----------------|------------------|---------------------------------------|
 | `db.transaction.rate` | UpDownCounter   | `{transaction}`  | The number of completed transactions. |
+
 ### Metric: `db.transaction.latency`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name                      | Instrument Type | Units (UCUM) | Description                      |
 |---------------------------|-----------------|--------------|----------------------------------|
 | `db.transaction.latency`  | Gauge           | `s`          | The average transaction latency. |
+
 ### Metric: `db.sql.count`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name             | Instrument Type | Units (UCUM) | Description          |
 |------------------|-----------------|--------------|----------------------|
 | `db.sql.count`   | Gauge           | `{sql}`      | The number of SQLs   |
+
 ### Metric: `db.sql.rate`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name          | Instrument Type | Units (UCUM) | Description                   |
 |---------------|-----------------|--------------|-------------------------------|
 | `db.sql.rate` | Gauge           | `{sql/s}`    | The number of SQL per second. |
+
 ### Metric: `db.sql.latency`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name              | Instrument Type | Units (UCUM) | Description               |
 |-------------------|-----------------|--------------|---------------------------|
 | `db.sql.latency`  | Gauge           | `s`          | The average SQL latency.  |
+
 ### Metric: `db.io.read.rate`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name               | Instrument Type | Units (UCUM) | Description                   |
 |--------------------|-----------------|--------------|-------------------------------|
 | `db.io.read.rate`  | Gauge           | `By`         | The physical read per second. |
+
 ### Metric: `db.io.write.rate`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name               | Instrument Type | Units (UCUM) | Description                     |
 |--------------------|-----------------|--------------|---------------------------------|
 | `db.io.write.rate` | Gauge           | `By`         | The physical write per second.  |
+
 ### Metric: `db.task.wait_count`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
 | Name                  | Instrument Type | Units (UCUM) | Description                |
 |-----------------------|-----------------|--------------|----------------------------|
 | `db.task.wait_count`  | UpDownCounter   | `{task}`     | Number of waiting tasks.   |
+
 ### Metric: `db.task.avg_wait_time`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
 | Name                 | Instrument Type | Units (UCUM) | Description             |
 |----------------------|-----------------|--------------|-------------------------|
 | `db.task.wait_count` | Gauge           | `s`          | Average task wait time. |
+
 ## Performance Metrics
+
 ### Metric: `db.cache.hit`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
@@ -190,6 +207,7 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 | Attribute | Type   | Description        | Example                           | Requirement Level |
 |-----------|--------|--------------------|-----------------------------------|-------------------|
 | `type`    | string | The type of cache. | `NORMAL`;`RECYCLE`;`FAST`;`KEEP`  | Recommended       |
+
 ### Metric: `db.sql.elapsed_time`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
@@ -201,6 +219,9 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 |--------------|--------|-----------------------------|------------------------------------------------------------|-------------------|
 | `sql_id`     | string | The sql statement id.       | `A758H`                                                    | Required          |
 | `sql_text`   | string | The text of sql statement.  | `select count(*) from gv$instance where status$ = 'OPEN'`  | Recommended       |
+
+**Notes:** This metric should be restricted for time series databases which do not support high cardinality.
+
 ### Metric: `db.lock.count`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
@@ -211,6 +232,7 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 | Attribute | Type   | Description        | Example           | Requirement Level |
 |-----------|--------|--------------------|-------------------|-------------------|
 | `type`    | string | The type of lock.  | `Row-level Lock`  | Recommended       |
+
 ### Metric: `db.lock.time`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
@@ -224,6 +246,8 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 | `blocking_sess_id` | string | The blocking session identifier. | `28871001`     | Recommended       |
 | `blocker_sess_id`  | string | The blocker session identifier.  | `28871041`     | Recommended       |
 | `locked_obj_name`  | string | The locked object name.          | `gv$instance`  | Recommended       |
+
+**Notes:** This metric should be restricted for time series databases which do not support high cardinality.
 
 ### Metric: `db.seq.scan.count`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
@@ -249,7 +273,6 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 | Name                     | Instrument Type | Units (UCUM)     | Description                                                                        |
 |--------------------------|-----------------|------------------|------------------------------------------------------------------------------------|
 | `db.overflow.lock.count` | UpDownCounter   | `{overflowLock}` | Number of times a thread attempted to acquire a lock when no locks were available. |
-
 
 ### Metric: `db.overflow.transaction.count`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
@@ -279,7 +302,6 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 |-----------------------|-----------------|--------------|------------------------------------------------------------------------------------------|
 | `db.cache.read.ratio` | Gauge           | `1`          | Percentage of page reads for this buffer pool that were satisfied by a cached page image |
 
-
 ### Metric: `db.cache.write.ratio`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
@@ -295,10 +317,10 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 | `db.lru.writes` | UpDownCounter   | `{lruWrites}` | Number of Least Recently Used  Writes. |
 
 ### Notes:
-
 - The database server performs LRU (Least Recently Used) writes as background writes that typically occur when the percentage of dirty buffers (pages that are not accessed) exceeds the percent that is specified for lru_max_dirty in the BUFFERPOOL configuration parameter.
 
 ## Resource Usage Metrics
+
 ### Metric: `db.disk.usage`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
@@ -310,6 +332,7 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 |-------------|--------|-----------------|----------------|-------------------|
 | `path`      | String | The disk path.  | `/dev`         | Recommended       |
 | `direction` | String | Write or read.  | `read`;`write` | Recommended       |
+
 ### Metric: `db.disk.utilization`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
@@ -321,6 +344,7 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 |-------------|--------|-----------------|----------------|-------------------|
 | `path`      | String | The disk path.  | `/dev`         | Recommended       |
 | `direction` | String | Write or read.  | `read`;`write` | Recommended       |
+
 ### Metric: `db.cpu.utilization`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
@@ -343,6 +367,7 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 | `iowait`    | iowait      | 
 | `interrupt` | interrupt   | 
 | `steal`     | steal       | 
+
 ### Metric: `db.mem.utilization`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
@@ -353,6 +378,7 @@ This metric is [recommended](https://github.com/open-telemetry/semantic-conventi
 | Attribute            | Type   | Description                 | Example                | Requirement Level |
 |----------------------|--------|-----------------------------|------------------------|-------------------|
 | `tablespace_name`    | String | Tablespace name identifier. | `default`; `interrupt` | Required          |
+
 ### Metric: `db.tablespace.size`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
@@ -363,6 +389,7 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 | Attribute            | Type   | Description                 | Example                | Requirement Level |
 |----------------------|--------|-----------------------------|------------------------|-------------------|
 | `tablespace_name`    | String | Tablespace name identifier. | `default`; `sysmaster` | Required          |
+
 ### Metric: `db.tablespace.used`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
@@ -373,6 +400,7 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 | Attribute            | Type   | Description                 | Example                | Requirement Level |
 |----------------------|--------|-----------------------------|------------------------|-------------------|
 | `tablespace_name`    | String | Tablespace name identifier. | `default`; `sysmaster` | Required          |
+
 ### Metric: `db.tablespace.max`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
@@ -383,6 +411,7 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 | Attribute            | Type   | Description                 | Example                | Requirement Level |
 |----------------------|--------|-----------------------------|------------------------|-------------------|
 | `tablespace_name`    | String | Tablespace name identifier. | `default`; `sysmaster` | Required          |
+
 ### Metric: `db.tablespace.utilization`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
@@ -409,13 +438,13 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 | `db.disk.read.count` | UpDownCounter      | {read}       | Actual number of physical reads to disk. |
 
 ## Maintenance Metrics
+
 ### Metric: `db.backup.cycle`
 This metric is [recommended](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#recommended).
 
 | Name              | Instrument Type | Units (UCUM) | Description    |
 |-------------------|-----------------|--------------|----------------|
 | `db.backup.cycle` | UpDownCounter   | `s`          | Backup cycle.  |
-
 
 ## Settings Metrics
 
@@ -430,7 +459,6 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 |----------------------|--------|---------------------------|------------------------|-------------------|
 | `database_name`      | String | Database name identifier. | `prod_db`; `sysmaster` | Required          |
 
-
 ### Metric: `db.database.buff.log.enabled`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
@@ -442,7 +470,6 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 |-----------------------|--------|---------------------------|------------------------|-------------------|
 | `database_name`       | String | Database name identifier. | `prod_db`; `sysmaster` | Required          |
 
-
 ### Metric: `db.database.ansi.compliant`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
 
@@ -453,7 +480,6 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 | Attribute             | Type   | Description               | Example                | Requirement Level |
 |-----------------------|--------|---------------------------|------------------------|-------------------|
 | `database_name`       | String | Database name identifier. | `prod_db`; `sysmaster` | Required          |
-
 
 ### Metric: `db.database.nls.enabled`
 This metric is [optional](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metric-requirement-level.md#opt-in).
@@ -478,8 +504,8 @@ This metric is [optional](https://github.com/open-telemetry/semantic-conventions
 |-----------------------|--------|---------------------------|------------------------|-------------------|
 | `database_name`       | String | Database name identifier. | `prod_db`; `sysmaster` | Required          |
 
-
 ## Custom metrics
+
 Please follow the guidebook if custom metrics sent, follow this specification to name the custom metrics.
 1. [Instrument Naming](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.22.0/specification/common/attribute-naming.md)
 2. [Attribute Naming](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.22.0/specification/common/attribute-naming.md)
@@ -487,7 +513,9 @@ Please follow the guidebook if custom metrics sent, follow this specification to
 e.g.
 `db.metrics.db_engine.type`,
 `db.metrics.data_compress.ratio`
+
 ## Related knowledge
+
 - General Attributes
   - [server attributes](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/attributes.md#server-attributes)
   - [call level attributes](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/database/database-spans.md#call-level-attributes)
@@ -500,7 +528,9 @@ e.g.
 - Units
   - [Units](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metrics.md#units) 
   - [UCUM](https://unitsofmeasure.org/ucum)
-## Reference
+
+# Reference
+
 - [Metrics Data Model](https://opentelemetry.io/docs/specs/otel/metrics/data-model/)
 - [OpenTelemetry Semantic Conventions](https://github.com/open-telemetry/semantic-conventions/tree/main/docs)
 - [Resource Semantic Conventions](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/resource/README.md)

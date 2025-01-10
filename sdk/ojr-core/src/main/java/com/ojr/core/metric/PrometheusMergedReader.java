@@ -30,10 +30,14 @@ public class PrometheusMergedReader implements MultiCollector {
         if (metricRestrictions == null)
             return false;
 
+        if (metricName == null)
+            return true;
+
         for (String metricRestriction : metricRestrictions) {
-            if (metricRestriction.equals(metricName))
+            if (metricName.startsWith(metricRestriction))
                 return true;
         }
+
         return false;
     }
 
