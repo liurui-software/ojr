@@ -6,6 +6,7 @@ import com.ojr.core.metric.MetricCalculationMode;
 import com.ojr.rdb.AbstractDbDc;
 import com.ojr.rdb.DbDcConfig;
 import com.ojr.rdb.DbDcUtil;
+import com.ojr.rdb.SemanticAttributes;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -39,6 +40,8 @@ public class DamengDc extends AbstractDbDc<DbDcConfig> {
     public void enrichResourceAttributes(ResourceEnricher enricher) {
         super.enrichResourceAttributes(enricher);
         enricher.enrich(DcUtil.OJR_PLUGIN, "dameng-db");
+        enricher.enrich(DbDcUtil.DB_ADDRESS, this.getDbAddress());
+        enricher.enrich(DbDcUtil.DB_PORT, this.getDbPort());
     }
 
         // Register metrics with specific calculation modes

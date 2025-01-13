@@ -16,6 +16,6 @@ instances:
     #otel.backend.url: http://localhost:4317
     otel.backend.url: http://localhost:4318
     otel.transport: prometheus
-    prometheus.port: 16543
+    prometheus.port: 16540
     prometheus.restricted.metrics: db.sql.elapsed_time,db.lock.time
     otel.service.name: DamengA

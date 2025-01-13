@@ -13,7 +13,7 @@ public class DamengUtil {
     public static final String SQL_COUNT_SQL = "select stat_val from v$sysstat where name in ('sql executed count')";
     public static final String IO_READ_COUNT_SQL = "select stat_val from v$sysstat where name in ('physical read count')";
     public static final String IO_WRITE_COUNT_SQL = "select stat_val from v$sysstat where name in ('physical write count')";
-    public static final String TASK_WAIT_COUNT_SQL = "select waiting from v$task_queue";
+    public static final String TASK_WAIT_COUNT_SQL = "SELECT COUNT(*) AS waiting FROM v$trxwait";
     public static final String TASK_AVG_WAIT_TIME_SQL = "select average_wait_time from v$task_queue";
 
     public static final String CACHE_HIT_SQL = "SELECT SUM(rat_hit) / COUNT(*), name FROM v$bufferpool GROUP BY name";
