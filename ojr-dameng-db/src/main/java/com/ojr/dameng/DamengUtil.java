@@ -13,12 +13,12 @@ public class DamengUtil {
     public static final String SQL_COUNT_SQL = "select stat_val from v$sysstat where name in ('sql executed count')";
     public static final String IO_READ_COUNT_SQL = "select stat_val from v$sysstat where name in ('physical read count')";
     public static final String IO_WRITE_COUNT_SQL = "select stat_val from v$sysstat where name in ('physical write count')";
-    public static final String TASK_WAIT_COUNT_SQL = "select waiting from v$task_queue";
+    public static final String TASK_WAIT_COUNT_SQL = "SELECT COUNT(*) AS waiting FROM v$trxwait";
     public static final String TASK_AVG_WAIT_TIME_SQL = "select average_wait_time from v$task_queue";
 
     public static final String CACHE_HIT_SQL = "SELECT SUM(rat_hit) / COUNT(*), name FROM v$bufferpool GROUP BY name";
     public static final String SQL_ELAPSED_TIME_SQL =
-            "SELECT EXEC_TIME as ELAPSED_TIME_MILLIS, SQL_ID as sql_id, SQL_TEXT as sql_text FROM V$SYSTEM_LONG_EXEC_SQLS ORDER BY EXEC_TIME DESC LIMIT 20";
+            "SELECT time_used/1000000.0 as time_used_seconds, sql_id, top_sql_text FROM v$sql_history ORDER BY time_used DESC limit 10";
     public static final String LOCK_COUNT_SQL = "select count(*), ltype from v$lock where blocked =1 group by ltype";
     public static final String LOCK_TIME_SQL = "SELECT timestampdiff(second, DS.create_time, sysdate) AS metric_value, L.ADDR AS lock_id, DS.SESS_ID AS blocking_sess_id, SS.SESS_ID AS blocker_sess_id, obj.OBJECT_NAME AS locked_obj_name FROM v$lock L LEFT JOIN v$sessions DS ON DS.TRX_ID = L.TRX_ID LEFT JOIN v$sessions SS ON SS.TRX_ID = L.TID LEFT JOIN dba_objects obj ON L.TABLE_ID = obj.OBJECT_ID WHERE L.BLOCKED = 1 LIMIT 20";
 

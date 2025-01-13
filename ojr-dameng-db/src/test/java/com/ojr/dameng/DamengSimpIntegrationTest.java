@@ -20,6 +20,9 @@ public class DamengSimpIntegrationTest {
 
         stmt = conn.createStatement();
 
+        String dropTableSQL = "DROP TABLE IF EXISTS ojr_users";
+        stmt.executeUpdate(dropTableSQL);
+
         String createTableSQL = "CREATE TABLE IF NOT EXISTS ojr_users (" +
                 "id INT PRIMARY KEY AUTO_INCREMENT, " +
                 "name VARCHAR(100), " +
@@ -54,8 +57,7 @@ public class DamengSimpIntegrationTest {
             System.out.printf("ID: %d, Name: %s, Email: %s%n", id, name, email);
         }
 
-        String deleteTableSQL = "DROP TABLE ojr_users";
-        stmt.executeUpdate(deleteTableSQL);
+        stmt.executeUpdate(dropTableSQL);
 
         rs.close();
         pstmt.close();
